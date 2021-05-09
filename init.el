@@ -1,7 +1,19 @@
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
 
-(require 'package)
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-(package-initialize)
+(setq package-enable-at-startup nil)
+(setq straight-use-package-by-default 1)
+(straight-use-package 'use-package)
 
 (menu-bar-mode -1)
 (toggle-scroll-bar -1)
@@ -30,12 +42,10 @@
 (electric-pair-mode)
 
 (use-package paradox
-  :ensure t
   :config
-  (setq paradox-github-token "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"))
+  (setq paradox-github-token ""))
 
 (use-package mwim
-  :ensure t
   :config
   (autoload 'mwim "mwim" nil t)
   (autoload 'mwim-beginning "mwim" nil t)
@@ -50,86 +60,68 @@
   ("C-e" . mwim-end))
 
 (use-package which-key
-  :ensure t
   :config
   (which-key-mode))
 
 (use-package htmlize
-  :ensure t
   :defer t)
 
 (use-package magit
-  :ensure t
   :defer t)
 
 (use-package solaire-mode
-  :ensure t
   :hook (after-init . solaire-global-mode))
 
 (use-package elcord
-  :ensure t
   :config
   (elcord-mode)
   (setq elcord--editor-name "Emacs")
   (setq elcord--editor-icon "spacemacs_icon"))
 
 (use-package try
-  :ensure t
   :defer t)
 
 (use-package nyan-mode
-  :ensure t
   :config
   (nyan-mode))
 
 (use-package company
-  :ensure t
   :config
   (global-company-mode))
 
 (use-package company-box
-  :ensure t
   :hook (company-mode . company-box-mode))
 
 (use-package lsp-mode
-  :ensure t
   :config
   (lsp-mode))
 
 (use-package lsp-java
-  :ensure t
   :hook
   (java-mode . lsp-deferred))
 
-(use-package lsp-ui
-  :ensure t)
+(use-package lsp-ui)
 
 (use-package flycheck
-  :ensure t
   :config
   (global-flycheck-mode))
 
 (use-package swiper
-  :ensure t
   :bind
   ("C-s" . swiper))
 
 (use-package ivy
-  :ensure t
   :config
   (ivy-mode))
 
 (use-package all-the-icons-ivy
-  :ensure t
   :init (add-hook 'after-init-hook 'all-the-icons-ivy-setup))
 
 (use-package counsel
-  :ensure t
   :config
   (counsel-mode))
 
 (use-package dashboard
-  :ensure t
   :config
   (dashboard-setup-startup-hook)
   (setq dashboard-startup-banner "~/.emacs.d/doom.png")
@@ -146,11 +138,9 @@
   (setq dashboard-set-navigator t)
   (setq dashboard-set-init-info t))
 
-(use-package all-the-icons
-  :ensure t)
+(use-package all-the-icons)
 
 (use-package doom-themes
- :ensure t
   :config
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t
@@ -161,22 +151,17 @@
   (doom-themes-org-config))
 
 ;;(use-package doom-modeline
-;;  :ensure t
 ;;  :init (doom-modeline-mode 1))
 
-(use-package spaceline
-  :ensure t)
+(use-package spaceline)
 
 (use-package spaceline-all-the-icons
-  :ensure t
   :config (spaceline-all-the-icons-theme))
 
 (use-package treemacs
-  :ensure t
   :bind ("<f9>" . treemacs))
 
 (use-package go-mode
-  :ensure t
   :hook
   (before-save . gofmt-before-save)
   (go-mode . lsp-deferred))
@@ -188,7 +173,6 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(indent-tabs-mode nil)
- '(package-selected-packages '(use-package))
  '(paradox-automatically-star nil))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
