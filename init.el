@@ -13,6 +13,8 @@
 
 (setq package-enable-at-startup nil)
 (setq straight-use-package-by-default 1)
+(defalias 'yes-or-no-p 'y-or-n-p)
+(setq backup-directory-alist '(("." . "~/.emacs.d/emacs-saves")))
 (straight-use-package 'use-package)
 
 (menu-bar-mode -1)
@@ -41,10 +43,6 @@
 (setq-default indent-tabs-mode nil)
 (electric-pair-mode)
 
-(use-package paradox
-  :config
-  (setq paradox-github-token ""))
-
 (use-package mwim
   :config
   (autoload 'mwim "mwim" nil t)
@@ -63,9 +61,6 @@
   :config
   (which-key-mode))
 
-(use-package htmlize
-  :defer t)
-
 (use-package magit
   :defer t)
 
@@ -73,13 +68,9 @@
   :hook (after-init . solaire-global-mode))
 
 (use-package elcord
+  :straight (elcord :fork "2000Slash/elcord")
   :config
-  (elcord-mode)
-  (setq elcord--editor-name "Emacs")
-  (setq elcord--editor-icon "spacemacs_icon"))
-
-(use-package try
-  :defer t)
+  (elcord-mode))
 
 (use-package nyan-mode
   :config
@@ -89,16 +80,40 @@
   :config
   (global-company-mode))
 
+(use-package tide
+  :config
+  (setq flycheck-check-syntax-automatically '(save mode-enabled))
+  (tide-hl-identifier-mode +1)
+  (setq company-tooltip-align-annotations t)
+  (add-hook 'before-save-hook 'tide-format-before-save)
+  :hook
+  (typescript-mode . (lambda ()
+                       (interactive)
+                       (tide-setup))))
+
+(use-package rust-mode
+  :hook (rust-mode . (lambda ()
+                       (lsp))))
+
 (use-package company-box
   :hook (company-mode . company-box-mode))
 
+(use-package lsp-treemacs)
+
 (use-package lsp-mode
   :config
+  (setq lsp-keymap-prefix "C-c l")
   (lsp-mode))
 
 (use-package lsp-java
   :hook
   (java-mode . lsp-deferred))
+
+(use-package lsp-python-ms
+  :init (setq lsp-python-ms-auto-install-server t)
+  :hook (python-mode . (lambda ()
+                         (require 'lsp-python-ms)
+                         (lsp))))  ; or lsp-deferred)
 
 (use-package lsp-ui)
 
@@ -150,13 +165,15 @@
   (doom-themes-treemacs-config)
   (doom-themes-org-config))
 
-;;(use-package doom-modeline
-;;  :init (doom-modeline-mode 1))
+;; (use-package doom-modeline
+;;   :init (doom-modeline-mode 1))
 
-(use-package spaceline)
+(use-package spaceline
+    :config
+    (spaceline-spacemacs-theme))
 
-(use-package spaceline-all-the-icons
-  :config (spaceline-all-the-icons-theme))
+;;(use-package spaceline-all-the-icons
+;;  :config (spaceline-all-the-icons-theme))
 
 (use-package treemacs
   :bind ("<f9>" . treemacs))
@@ -167,13 +184,51 @@
   (go-mode . lsp-deferred))
 
 
+
+
+(setq exit-messages '(
+	"Please don't leave, there's more demons to toast!"
+	"Let's beat it -- This is turning into a bloodbath!"
+	"I wouldn't leave if I were you. Vim is much worse."
+	"Don't leave yet -- There's a demon around that corner!"
+	"Ya know, next time you come in here I'm gonna toast ya."
+	"Go ahead and leave. See if I care."
+	"Are you sure you want to quit this great editor?"
+	"Emacs will remember that."
+	"Emacs, Emacs never changes."
+	"Okay, look. We've both said a lot of things you're going to regret..."
+	"You are *not* prepared!"
+	"Look, bud. You leave now and you forfeit your body count!"
+	"Get outta here and go back to your boring editors."
+	"You're lucky I don't smack you for thinking about leaving."
+	"Don't go now, there's a dimensional shambler waiting at the prompt!"
+	"Just leave. When you come back I'll be waiting with a bat."
+	"Are you a bad enough dude to stay?"
+	"It was worth the risk... I assure you."
+	"I'm willing to take full responsibility for the horrible events of the last 24 hours."
+	))
+
+(defun random-choice (items)
+  (let* ((size (length items))
+	 (index (random size)))
+	(nth index items)))
+
+(defun save-buffers-kill-emacs-with-confirm ()
+  (interactive)
+  (if (null current-prefix-arg)
+	  (if (y-or-n-p (format "%s Quit? " (random-choice exit-messages)))
+	(save-buffers-kill-emacs))
+	(save-buffers-kill-emacs)))
+
+(global-set-key "\C-x\C-c" 'save-buffers-kill-emacs-with-confirm)
+
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(indent-tabs-mode nil)
- '(paradox-automatically-star nil))
+ '(indent-tabs-mode nil))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
